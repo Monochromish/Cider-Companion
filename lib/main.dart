@@ -7,6 +7,7 @@ import 'package:cider_remote/webview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nsd/nsd.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 void main() {
   runApp(MyApp());
@@ -65,6 +66,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  final quickActions = QuickActions();
   void _scanMDNS() async {
     final discovery = await startDiscovery('_cider-remote._tcp');
     discovery.addListener(() {
@@ -92,6 +94,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    quickActions.setShortcutItems([
+      ShortcutItem(type: 'instance', localizedTitle: 'Look for Instance'),
+      ShortcutItem(type: 'scan', localizedTitle: 'Scan QR Code'),
+    ]);
+    quickActions.initialize((type) {
+      if (type == 'instance') {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => MyHomePage(title: '',)),
+        );
+      } else if (type == 'scan') {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => QRViewScreen()),
+        );
+      }
+    });
+
     animationController =
         AnimationController(duration: new Duration(seconds: 2), vsync: this);
     animationController.repeat();
